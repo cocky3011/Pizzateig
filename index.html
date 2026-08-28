@@ -1,0 +1,1119 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="theme-color" content="#17191d">
+
+  <title>Pizzateig Rechner</title>
+
+  <style>
+    :root {
+      --bg: #0f1115;
+      --card: #171a20;
+      --text: #f6f7f9;
+      --muted: #9aa3af;
+      --accent: #d96b32;
+      --accent2: #f0a06f;
+      --line: #2a3038;
+      --good: #91d7ad;
+      --input: #111419;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html,
+    body {
+      margin: 0;
+      min-height: 100%;
+      background: linear-gradient(180deg, #0d0f12 0%, #13161b 100%);
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", sans-serif;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    body {
+      padding:
+        calc(env(safe-area-inset-top) + 18px)
+        16px
+        calc(env(safe-area-inset-bottom) + 28px);
+    }
+
+    .wrap {
+      max-width: 720px;
+      margin: 0 auto;
+    }
+
+    .hero {
+      background: linear-gradient(145deg, #1a1e24, #111419);
+      border: 1px solid #242a32;
+      border-radius: 26px;
+      padding: 22px 20px 18px;
+      box-shadow: 0 14px 40px rgba(0, 0, 0, 0.28);
+      margin-bottom: 16px;
+    }
+
+    .eyebrow {
+      color: var(--accent2);
+      font-size: 12px;
+      letter-spacing: 0.18em;
+      font-weight: 800;
+      text-transform: uppercase;
+      margin-bottom: 6px;
+    }
+
+    h1 {
+      font-size: 32px;
+      line-height: 1.05;
+      margin: 0 0 8px;
+    }
+
+    .sub {
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.4;
+    }
+
+    .grid {
+      display: grid;
+      gap: 14px;
+    }
+
+    @media (min-width: 620px) {
+      .grid.two {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+
+    .card {
+      background: rgba(23, 26, 32, 0.95);
+      border: 1px solid var(--line);
+      border-radius: 22px;
+      padding: 16px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.18);
+    }
+
+    .card h2 {
+      margin: 0 0 14px;
+      font-size: 15px;
+      letter-spacing: 0.02em;
+      color: #f2f3f5;
+    }
+
+    .row {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 12px;
+      align-items: center;
+      padding: 11px 0;
+      border-bottom: 1px solid #232931;
+    }
+
+    .row:last-child {
+      border-bottom: 0;
+    }
+
+    label .main {
+      font-weight: 700;
+      font-size: 15px;
+    }
+
+    label .hint {
+      color: var(--muted);
+      font-size: 12px;
+      margin-top: 2px;
+    }
+
+    input,
+    select {
+      width: 128px;
+      border: 1px solid #313842;
+      background: var(--input);
+      color: var(--text);
+      border-radius: 12px;
+      padding: 10px 11px;
+      font-size: 16px;
+      font-weight: 700;
+      outline: none;
+      text-align: right;
+    }
+
+    select {
+      text-align-last: right;
+    }
+
+    input:focus,
+    select:focus {
+      border-color: var(--accent);
+    }
+
+    .switch {
+      position: relative;
+      width: 52px;
+      height: 30px;
+      display: inline-block;
+    }
+
+    .switch input {
+      display: none;
+    }
+
+    .slider {
+      position: absolute;
+      inset: 0;
+      background: #343b45;
+      border-radius: 999px;
+      transition: 0.2s;
+    }
+
+    .slider:before {
+      content: "";
+      position: absolute;
+      width: 24px;
+      height: 24px;
+      left: 3px;
+      top: 3px;
+      background: white;
+      border-radius: 50%;
+      transition: 0.2s;
+    }
+
+    .switch input:checked + .slider {
+      background: var(--accent);
+    }
+
+    .switch input:checked + .slider:before {
+      transform: translateX(22px);
+    }
+
+    .result {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 14px;
+      padding: 14px 0;
+      border-bottom: 1px solid #28303a;
+      align-items: end;
+    }
+
+    .result:last-child {
+      border-bottom: 0;
+    }
+
+    .result .name {
+      color: #d7dbe0;
+      font-size: 14px;
+      font-weight: 650;
+    }
+
+    .result .value {
+      font-size: 24px;
+      font-weight: 850;
+      letter-spacing: -0.02em;
+    }
+
+    .result .unit {
+      font-size: 13px;
+      color: var(--muted);
+      font-weight: 700;
+      margin-left: 4px;
+    }
+
+    .result.highlight .value {
+      color: var(--good);
+    }
+
+    .tiny {
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.45;
+      margin-top: 12px;
+    }
+
+    .actions {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-top: 14px;
+    }
+
+    button {
+      border: 0;
+      border-radius: 14px;
+      padding: 12px 14px;
+      font-size: 15px;
+      font-weight: 800;
+      background: #242a32;
+      color: #fff;
+    }
+
+    button.primary {
+      background: var(--accent);
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    .footer {
+      color: #6f7884;
+      font-size: 11px;
+      text-align: center;
+      margin-top: 18px;
+      line-height: 1.4;
+    }
+  </style>
+</head>
+
+<body>
+
+<div class="wrap">
+
+  <section class="hero">
+    <div class="eyebrow">Pizza</div>
+    <h1>Pizzateig Rechner</h1>
+    <div class="sub">
+      Personen, Zeit und Teigstil einstellen.
+      Die Zutaten werden sofort berechnet.
+    </div>
+  </section>
+
+  <div class="grid two">
+
+    <section class="card">
+
+      <h2>Einstellungen</h2>
+
+      <div class="row">
+        <label>
+          <div class="main">Personen</div>
+          <div class="hint">Anzahl der Pizzen</div>
+        </label>
+
+        <input
+          id="persons"
+          type="number"
+          min="1"
+          max="20"
+          step="1"
+          value="4"
+        >
+      </div>
+
+      <div class="row">
+        <label>
+          <div class="main">Teig pro Person</div>
+          <div class="hint">z. B. 250 g</div>
+        </label>
+
+        <input
+          id="doughpp"
+          type="number"
+          min="150"
+          max="400"
+          step="5"
+          value="250"
+        >
+      </div>
+
+      <div class="row">
+        <label>
+          <div class="main">Gehzeit</div>
+          <div class="hint">bei ca. 20–22 °C</div>
+        </label>
+
+        <select id="hours">
+          <option value="2">2 h</option>
+          <option value="4">4 h</option>
+          <option value="6">6 h</option>
+          <option value="12" selected>12 h</option>
+          <option value="18">18 h</option>
+          <option value="24">24 h</option>
+        </select>
+      </div>
+
+      <div class="row">
+        <label>
+          <div class="main">Hydration</div>
+          <div class="hint">Wasser bezogen auf Mehl</div>
+        </label>
+
+        <input
+          id="hydration"
+          type="number"
+          min="45"
+          max="90"
+          step="0.5"
+          value="65"
+        >
+      </div>
+
+      <div class="row">
+        <label>
+          <div class="main">Salz</div>
+          <div class="hint">Bäckerprozent</div>
+        </label>
+
+        <input
+          id="saltpct"
+          type="number"
+          min="1"
+          max="4"
+          step="0.1"
+          value="2.7"
+        >
+      </div>
+
+    </section>
+
+
+    <section class="card">
+
+      <h2>Lievito Madre</h2>
+
+      <div class="row">
+
+        <label>
+          <div class="main">LM verwenden</div>
+          <div class="hint">optional</div>
+        </label>
+
+        <label class="switch">
+
+          <input
+            id="useLm"
+            type="checkbox"
+          >
+
+          <span class="slider"></span>
+
+        </label>
+
+      </div>
+
+
+      <div id="lmOptions">
+
+        <div class="row">
+
+          <label>
+            <div class="main">LM-Anteil</div>
+            <div class="hint">vom Gesamtmehl</div>
+          </label>
+
+          <input
+            id="lmpct"
+            type="number"
+            min="1"
+            max="60"
+            step="1"
+            value="15"
+          >
+
+        </div>
+
+
+        <div class="row">
+
+          <label>
+            <div class="main">LM-Hydration</div>
+            <div class="hint">typisch 50 %</div>
+          </label>
+
+          <input
+            id="lmhydr"
+            type="number"
+            min="30"
+            max="100"
+            step="1"
+            value="50"
+          >
+
+        </div>
+
+
+        <div class="row">
+
+          <label>
+            <div class="main">Zusatzhefe</div>
+            <div class="hint">
+              Anteil der normalen Hefemenge
+            </div>
+          </label>
+
+          <input
+            id="yeastWithLm"
+            type="number"
+            min="0"
+            max="100"
+            step="5"
+            value="50"
+          >
+
+        </div>
+
+      </div>
+
+
+      <div class="tiny">
+
+        Bei aktivem LM werden dessen Mehl und Wasser
+        automatisch von den Zugabemengen abgezogen.
+
+      </div>
+
+    </section>
+
+  </div>
+
+
+  <section
+    class="card"
+    style="margin-top:14px"
+  >
+
+    <h2>Dein Teig</h2>
+
+
+    <div class="result">
+
+      <div class="name">
+        Zielteig gesamt
+      </div>
+
+      <div>
+
+        <span
+          class="value"
+          id="totalDough"
+        >
+          1000
+        </span>
+
+        <span class="unit">
+          g
+        </span>
+
+      </div>
+
+    </div>
+
+
+    <div class="result">
+
+      <div class="name">
+        Gesamtmehl
+      </div>
+
+      <div>
+
+        <span
+          class="value"
+          id="totalFlour"
+        >
+          596
+        </span>
+
+        <span class="unit">
+          g
+        </span>
+
+      </div>
+
+    </div>
+
+
+    <div class="result highlight">
+
+      <div class="name">
+        Mehl zugeben
+      </div>
+
+      <div>
+
+        <span
+          class="value"
+          id="addFlour"
+        >
+          596
+        </span>
+
+        <span class="unit">
+          g
+        </span>
+
+      </div>
+
+    </div>
+
+
+    <div class="result highlight">
+
+      <div class="name">
+        Wasser zugeben
+      </div>
+
+      <div>
+
+        <span
+          class="value"
+          id="addWater"
+        >
+          387
+        </span>
+
+        <span class="unit">
+          g
+        </span>
+
+      </div>
+
+    </div>
+
+
+    <div class="result">
+
+      <div class="name">
+        Salz
+      </div>
+
+      <div>
+
+        <span
+          class="value"
+          id="salt"
+        >
+          16.1
+        </span>
+
+        <span class="unit">
+          g
+        </span>
+
+      </div>
+
+    </div>
+
+
+    <div class="result">
+
+      <div class="name">
+        Frische Hefe
+      </div>
+
+      <div>
+
+        <span
+          class="value"
+          id="yeast"
+        >
+          0.72
+        </span>
+
+        <span class="unit">
+          g
+        </span>
+
+      </div>
+
+    </div>
+
+
+    <div
+      class="result"
+      id="lmResult"
+    >
+
+      <div class="name">
+        Lievito Madre
+      </div>
+
+      <div>
+
+        <span
+          class="value"
+          id="lm"
+        >
+          0
+        </span>
+
+        <span class="unit">
+          g
+        </span>
+
+      </div>
+
+    </div>
+
+
+    <div class="actions">
+
+      <button id="resetBtn">
+        Standard
+      </button>
+
+      <button
+        id="copyBtn"
+        class="primary"
+      >
+        Rezept kopieren
+      </button>
+
+    </div>
+
+
+    <div class="tiny">
+
+      Hefemenge = praxisnaher Startwert.
+
+      Bei deutlich wärmerer Küche weniger,
+      bei kälterer mehr verwenden.
+
+    </div>
+
+  </section>
+
+
+  <div class="footer">
+
+    Läuft komplett lokal im Browser.
+
+    Werte werden auf diesem Gerät gespeichert.
+
+  </div>
+
+</div>
+
+
+<script>
+
+const yeastTable = {
+
+  2: 0.0080,
+
+  4: 0.0040,
+
+  6: 0.0025,
+
+  12: 0.0012,
+
+  18: 0.0008,
+
+  24: 0.0005
+
+};
+
+
+const ids = [
+
+  "persons",
+
+  "doughpp",
+
+  "hours",
+
+  "hydration",
+
+  "saltpct",
+
+  "useLm",
+
+  "lmpct",
+
+  "lmhydr",
+
+  "yeastWithLm"
+
+];
+
+
+const $ = id =>
+  document.getElementById(id);
+
+
+function num(id) {
+
+  return parseFloat(
+    $(id).value
+  ) || 0;
+
+}
+
+
+function fmt(v, digits = 0) {
+
+  return v.toLocaleString(
+    "de-DE",
+    {
+      minimumFractionDigits: digits,
+      maximumFractionDigits: digits
+    }
+  );
+
+}
+
+
+function save() {
+
+  const data = {};
+
+  ids.forEach(id => {
+
+    data[id] =
+      $(id).type === "checkbox"
+        ? $(id).checked
+        : $(id).value;
+
+  });
+
+
+  localStorage.setItem(
+    "pizzaCalcSettings",
+    JSON.stringify(data)
+  );
+
+}
+
+
+function load() {
+
+  try {
+
+    const data =
+      JSON.parse(
+        localStorage.getItem(
+          "pizzaCalcSettings"
+        ) || "{}"
+      );
+
+
+    ids.forEach(id => {
+
+      if (data[id] !== undefined) {
+
+        if ($(id).type === "checkbox") {
+
+          $(id).checked = data[id];
+
+        } else {
+
+          $(id).value = data[id];
+
+        }
+
+      }
+
+    });
+
+  } catch (e) {}
+
+}
+
+
+function calc() {
+
+  const persons =
+    Math.max(
+      1,
+      num("persons")
+    );
+
+
+  const doughpp =
+    Math.max(
+      1,
+      num("doughpp")
+    );
+
+
+  const hydration =
+    num("hydration") / 100;
+
+
+  const saltPct =
+    num("saltpct") / 100;
+
+
+  const hours =
+    parseInt(
+      $("hours").value,
+      10
+    );
+
+
+  const useLm =
+    $("useLm").checked;
+
+
+  const lmPct =
+    num("lmpct") / 100;
+
+
+  const lmHydr =
+    num("lmhydr") / 100;
+
+
+  const yeastFactorLm =
+    num("yeastWithLm") / 100;
+
+
+  const targetDough =
+    persons * doughpp;
+
+
+  const baseYeastPct =
+    yeastTable[hours] || 0.0012;
+
+
+  const yeastPct =
+    baseYeastPct *
+    (
+      useLm
+        ? yeastFactorLm
+        : 1
+    );
+
+
+  const totalFlour =
+    targetDough /
+    (
+      1 +
+      hydration +
+      saltPct +
+      yeastPct
+    );
+
+
+  const totalWater =
+    totalFlour *
+    hydration;
+
+
+  const lmTotal =
+    useLm
+      ? totalFlour * lmPct
+      : 0;
+
+
+  const lmFlour =
+    useLm && lmTotal > 0
+      ? lmTotal / (1 + lmHydr)
+      : 0;
+
+
+  const lmWater =
+    lmTotal -
+    lmFlour;
+
+
+  const flourToAdd =
+    totalFlour -
+    lmFlour;
+
+
+  const waterToAdd =
+    totalWater -
+    lmWater;
+
+
+  const salt =
+    totalFlour *
+    saltPct;
+
+
+  const yeast =
+    totalFlour *
+    yeastPct;
+
+
+  $("totalDough").textContent =
+    fmt(
+      targetDough,
+      0
+    );
+
+
+  $("totalFlour").textContent =
+    fmt(
+      totalFlour,
+      0
+    );
+
+
+  $("addFlour").textContent =
+    fmt(
+      flourToAdd,
+      0
+    );
+
+
+  $("addWater").textContent =
+    fmt(
+      waterToAdd,
+      0
+    );
+
+
+  $("salt").textContent =
+    fmt(
+      salt,
+      1
+    );
+
+
+  $("yeast").textContent =
+    fmt(
+      yeast,
+      2
+    );
+
+
+  $("lm").textContent =
+    fmt(
+      lmTotal,
+      0
+    );
+
+
+  $("lmOptions").classList.toggle(
+    "hidden",
+    !useLm
+  );
+
+
+  $("lmResult").classList.toggle(
+    "hidden",
+    !useLm
+  );
+
+
+  save();
+
+}
+
+
+function reset() {
+
+  $("persons").value = 4;
+
+  $("doughpp").value = 250;
+
+  $("hours").value = 12;
+
+  $("hydration").value = 65;
+
+  $("saltpct").value = 2.7;
+
+  $("useLm").checked = false;
+
+  $("lmpct").value = 15;
+
+  $("lmhydr").value = 50;
+
+  $("yeastWithLm").value = 50;
+
+  calc();
+
+}
+
+
+async function copyRecipe() {
+
+  const useLm =
+    $("useLm").checked;
+
+
+  const text = [
+
+    `Pizzateig für ${$("persons").value} Personen`,
+
+    `${$("hours").value} h Gehzeit · ${$("hydration").value} % Hydration`,
+
+    "",
+
+    `Mehl: ${$("addFlour").textContent} g`,
+
+    `Wasser: ${$("addWater").textContent} g`,
+
+    `Salz: ${$("salt").textContent} g`,
+
+    `Frische Hefe: ${$("yeast").textContent} g`,
+
+    ...(useLm
+      ? [
+          `Lievito Madre: ${$("lm").textContent} g`
+        ]
+      : []
+    )
+
+  ].join("\n");
+
+
+  try {
+
+    await navigator.clipboard.writeText(
+      text
+    );
+
+
+    const old =
+      $("copyBtn").textContent;
+
+
+    $("copyBtn").textContent =
+      "Kopiert ✓";
+
+
+    setTimeout(
+      () => {
+
+        $("copyBtn").textContent =
+          old;
+
+      },
+      1200
+    );
+
+
+  } catch (e) {
+
+    alert(text);
+
+  }
+
+}
+
+
+ids.forEach(id => {
+
+  $(id).addEventListener(
+    "input",
+    calc
+  );
+
+});
+
+
+$("resetBtn").addEventListener(
+  "click",
+  reset
+);
+
+
+$("copyBtn").addEventListener(
+  "click",
+  copyRecipe
+);
+
+
+load();
+
+calc();
+
+</script>
+
+</body>
+</html>
